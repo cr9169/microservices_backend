@@ -3,22 +3,18 @@ import IPerson from './interfaces/personInterface';
 import IGroup from './interfaces/groupInterface';
 import { config } from "../../config";
 
-// AXIOS =>
+// לכתוב רק פונציות שמשלבות אנשים וקבוצות, אם לא אז הוא ישתמש בפרוקסי שיעביר אותו לסרביסים בנפרד
 
 // person:
 
+
 export const getPersonInGroupByName = async(name: string, groupID: string): Promise<IPerson> => {
-    const person: IPerson = await (await axios.get(`${config.PERSON_API_BASE_URL}person/${name}/${groupID}`)).data;
+    const person: IPerson =  (await axios.get(`${config.PERSON_API_BASE_URL}person/${name}/${groupID}`)).data;
     return person;
 };
 
 export const getAllGroupsOfPerson = async(id: string): Promise<IPerson> => {
-    const person: IPerson = await (await axios.get(`${config.PERSON_API_BASE_URL}person/All/groups/${id}`)).data;
-    return person;
-};
-
-export const getPopulatedPeople = async(): Promise<IPerson> => {
-    const person: IPerson = await (await axios.get(`${config.PERSON_API_BASE_URL}person/populated`)).data;
+    const person: IPerson =  (await axios.get(`${config.PERSON_API_BASE_URL}person/All/groups/${id}`)).data;
     return person;
 };
 
@@ -42,12 +38,9 @@ export const getAllGroupsAndPeopleInGroup = async(id: string): Promise<any> => {
     return groupsAndPeople;
 };
 
-export const getPopulatedGroups = async(): Promise<any> => {
-    const populatedGroups = await axios.get(`${config.GROUP_API_BASE_URL}/group/populated`);
-    return populatedGroups;
-};
 
 export const updateGroupByID = async(id: string, group: IGroup): Promise<void> => {
+
     await axios.post(`${config.GROUP_API_BASE_URL}group/update/${id}`, group);
 };
 
@@ -55,5 +48,3 @@ export const deleteGroupByID = async(id: string): Promise<void> => {
     await axios.delete(`${config.GROUP_API_BASE_URL}group/${id}`);
 };
 
-
-// PROXY => 

@@ -1,16 +1,8 @@
 import express from "express";
-import {deleteGroupByID, getPersonInGroupByName, getAllGroupsOfPerson, getPopulatedPeople, deletePersonByID, createPerson, updatePersonByID, getAllGroupsAndPeopleInGroup, getPopulatedGroups, updateGroupByID, getPersonByID, getAllPeople, getGroupByID, getAllGroups, createGroup} from "./manager"
+import {getPersonInGroupByName, getAllGroupsOfPerson, deletePersonByID, createPerson, updatePersonByID, getAllGroupsAndPeopleInGroup, updateGroupByID, deleteGroupByID} from "./manager"
 
+// לכתוב רק פונציות שמשלבות אנשים וקבוצות, אם לא אז הוא ישתמש בפרוקסי שיעביר אותו לסרביסים בנפרד
 // Person
-
-export const getPersonByIDC = async (req:express.Request, res:express.Response) => {
-    res.json(await getPersonByID(req.params.id));
-};
-
-export const getAllPeopleC = async (req:express.Request, res:express.Response) => {
-    
-    res.json(await getAllPeople());
-};
 
 export const deletePersonByIDC = async (req:express.Request, res:express.Response) => {
     res.json(await deletePersonByID(req.params.id));
@@ -33,27 +25,12 @@ export const getAllGroupsOfPersonC = async (req:express.Request, res:express.Res
     res.json(await getAllGroupsOfPerson(req.params.id));
 };
 
-export const getPopulatedPeopleC = async (req:express.Request, res:express.Response) => {
-    res.json(await getPopulatedPeople());
-};
 
 
 // Group 
 
-export const getGroupByIDC = async (req:express.Request, res:express.Response) => {
-    res.json(await getGroupByID(req.params.id));
-};
-
-export const getAllGroupsC = async (req:express.Request, res:express.Response) => {
-    res.json(await getAllGroups());
-};
-
 export const deleteGroupByIDC = async (req:express.Request, res:express.Response) => {
     res.json(await deleteGroupByID(req.params.id));
-};
-
-export const createGroupC = async (req:express.Request, res:express.Response) => {
-    res.json(await createGroup(req.body.name));
 };
 
 export const updateGroupByIDC = async (req:express.Request, res:express.Response) => {
@@ -62,8 +39,4 @@ export const updateGroupByIDC = async (req:express.Request, res:express.Response
 
 export const getAllGroupsAndPeopleInGroupC = async (req:express.Request, res:express.Response) => {
     res.json(await getAllGroupsAndPeopleInGroup(req.params.id));
-};
-
-export const getPopulatedGroupsC = async (req:express.Request, res:express.Response) => {
-    res.json(await getPopulatedGroups());
 };
