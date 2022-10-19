@@ -1,4 +1,4 @@
-import { getPersonByID, deletePersonByID, createPerson, updatePersonByID, getPersonInGroupByName, getAllGroupsOfPerson, getAllPeople} from "./repository";
+import { getPersonByID, deletePersonByID, createPerson, updatePersonByID, getPersonInGroupByName, getAllGroupsOfPerson, getAllPeople, updatePersonObjectByID} from "./repository";
 import IPerson from "./interface";
 import { personModel } from "./model";
 
@@ -21,6 +21,10 @@ export const createPersonM = (person: IPerson) => {
 
 export const updatePersonByIDM = (person: IPerson, id: string) => {
     return updatePersonByID(person, id);
+};
+
+export const updatePersonObjectByIDM = (person: IPerson, id: string) => {
+    return updatePersonObjectByID(person, id);
 };
 
 export const getPersonInGroupByNameM = (name: string, groupID: string) => {

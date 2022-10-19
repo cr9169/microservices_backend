@@ -70,6 +70,10 @@ export const updatePersonByID = async (person: IPerson, id: string) => { // chec
     return personModel.updateOne({_id: id}, person);
 };
 
+export const updatePersonObjectByID = async (person: IPerson, id: string) => { // check if the actuall function is the problem in the backend (or the frontend)
+    return personModel.updateOne({_id: id}, person);
+};
+
 export const getPersonInGroupByName = async (name: string, groupID: string) => {
     let personFound: IPerson | null = null;
     const group = await groupModel.findById(groupID);

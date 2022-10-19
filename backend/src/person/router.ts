@@ -1,5 +1,5 @@
 import express, { Router } from 'express';
-import { getPersonByIDC, deletePersonByIDC, createPersonC, updatePersonByIDC, getPersonInGroupByNameC, getAllGroupsOfPersonC, getPopulatedPeople, getAllPeopleC } from "./controller"
+import { getPersonByIDC, deletePersonByIDC, createPersonC, updatePersonByIDC, getPersonInGroupByNameC, getAllGroupsOfPersonC, getPopulatedPeople, getAllPeopleC, updatePersonObjectByIDC } from "./controller"
 
 const personRoute: Router = express.Router();
   
@@ -13,5 +13,7 @@ personRoute.delete("/:id", deletePersonByIDC); // ..
 
 personRoute.post("/", createPersonC); // ..
 personRoute.post("/update/:id", updatePersonByIDC); // ..
+personRoute.post("/update/person/object/:id", updatePersonObjectByIDC); // 
+
 
 export default personRoute;

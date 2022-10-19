@@ -1,4 +1,4 @@
-import { getGroupByID, deleteGroupByID, createGroup, updateGroupByID, getAllGroupsAndPeopleInGroup, getAllGroups } from "./repository";
+import { getGroupByID, deleteGroupByID, createGroup, updateGroupByID, getAllGroupsAndPeopleInGroup, getAllGroups, updateGroupObjectByID } from "./repository";
 import IGroup from "./interface";
 import { groupModel } from "./model";
 
@@ -23,6 +23,10 @@ export const updateGroupByIDM = (group: IGroup, groupID: string) => {
      group.people.length == new Set(group.people as string[]).size && !(group.groups as string[]).includes(groupID))
         return updateGroupByID(group, groupID);
     console.error("cant update group");
+};
+
+export const updateGroupObjectByIDM = (groupID: string, group: IGroup) => {
+    return updateGroupObjectByID(groupID, group);
 };
 
 export const getAllGroupsAndPeopleInGroupM = (id: string) => {
