@@ -24,6 +24,11 @@ export const deletePersonByID = async (id: string) => {
     return personModel.findOneAndRemove({_id:id});
 };
 
+export const simplyCreatePerson = async (person: IPerson) => {
+    const createdPerson: IPerson = await personModel.create(person);
+    return createdPerson;
+}
+
 export const createPerson = async (person: IPerson) => {
     
     const createdPerson: IPerson = await personModel.create(person);

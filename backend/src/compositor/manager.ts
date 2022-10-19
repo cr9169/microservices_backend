@@ -7,27 +7,106 @@ import { config } from "../../config";
 // לשנות לשימוש בפונרציות אקסיוס פשוטות בשילוב עם לוגיקה על מנת לבצע את הפעולות למטה
 // person:
 
-export const getPersonInGroupByName = async(name: string, groupID: string): Promise<IPerson> => {//
-    const person: IPerson =  (await axios.get(`${config.PERSON_API_BASE_URL}person/${name}/${groupID}`)).data;
-    return person;
+export const getPersonInGroupByName = async(name: string, groupID: string): Promise<{groups: IGroup[]} | Error> => {
+
+    const personGroups: { groups: IGroup[] } = { groups: [] };
+    const group: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${groupID}`)).data;
+    
+    if(group)
+    {
+        for(const person of group.people) {
+            let personFound: IPerson = (await axios.get(`${config.PERSON_API_BASE_URL}person/${person}`)).data;
+            if (personFound && personFound.firstName == name)
+            {
+                personFound.groups.map( async(personFoundgroup: string) => {
+                    let foundGroup: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${personFoundgroup}`)).data;
+                    personGroups.groups.push(foundGroup);
+                }) 
+                return personGroups; // 
+            }
+        }
+    }
+
+    return (new Error("cant find group!!!"));
+
 };
 
 
-export const getAllGroupsOfPerson = async(id: string): Promise<IPerson> => {//
-    const person: IPerson =  (await axios.get(`${config.PERSON_API_BASE_URL}person/All/groups/${id}`)).data;
-    return person;
+export const getAllGroupsOfPerson = async(id: string): Promise<IGroup[]> => {
+    const groupsOfPerson: IGroup[] = [];
+    const prs: IPerson = (await axios.get(`${config.PERSON_API_BASE_URL}person/${id}`)).data;
+    prs.groups.map( async(group: string) => {
+        let foundGroup: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${group}`)).data;
+        groupsOfPerson.push(foundGroup);
+    })
+
+    return groupsOfPerson;
 };
 
-export const deletePersonByID = async(id: string): Promise<void> => {//
-    await axios.delete(`${config.PERSON_API_BASE_URL}person/${id}`);
+export const deletePersonByID = async(id: string): Promise<void> => {
+    const person: IPerson = (await axios.get(`${config.PERSON_API_BASE_URL}person/${id}`)).data;
+
+    if (person?.groups.length == 0)
+    {
+        await axios.delete(`${config.PERSON_API_BASE_URL}person/${id}`);
+    }
+
+    else {
+        const personGroups: string[] | undefined = person?.groups;
+        personGroups!.forEach(async (group) => {
+            const groupToUpdate: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${group}`)).data;
+            groupToUpdate?.people.splice(groupToUpdate?.people.indexOf(id), 1);
+            await axios.post(`${config.GROUP_API_BASE_URL}group/update/group/object/${group}`, { people: groupToUpdate?.people, groups: groupToUpdate?.groups});
+        });
+
+        await axios.delete(`${config.PERSON_API_BASE_URL}person/${id}`);
+    }
 };
 
-export const createPerson = async(person: IPerson): Promise<void> => {//
-    await axios.post(`${config.PERSON_API_BASE_URL}person`, person);
+export const createPerson = async(person: IPerson): Promise<void> => {
+
+    const createdPerson: IPerson = (await axios.post(`${config.PERSON_API_BASE_URL}person/simply/create/${person}`)).data;
+
+	createdPerson.groups.forEach( async (group) => {
+        const foundGroup : IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${group}`)).data;
+        if(foundGroup)
+        {
+            let name: string = foundGroup.name;
+            let groups: string[] = foundGroup.groups;
+            let persons: string[] = foundGroup.people; 
+            persons.push(createdPerson._id!.toString());
+            await axios.post(`${config.GROUP_API_BASE_URL}group/update/group/object/${group}`, { name: name, groups: groups, people: persons });
+        }
+        else
+            console.error("cant find group");
+    });
 };
 
-export const updatePersonByID = async(id: string, person: IPerson): Promise<void> => {//
-    await axios.post(`${config.PERSON_API_BASE_URL}person/update/${id}`, person);
+export const updatePersonByID = async(id: string, person: IPerson): Promise<void> => {
+    const foundPerson: IPerson = (await axios.get(`${config.PERSON_API_BASE_URL}person/${id}`)).data;
+    if(foundPerson)
+    {
+        person.groups.forEach( async (group: string) => {
+            const personGroup: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${group}`)).data;
+            if(!personGroup?.people.includes(id))
+                {
+                    const newPersonGroupPeople: string[] | undefined = personGroup?.people; 
+                    newPersonGroupPeople?.push(id);
+                    await axios.post(`${config.GROUP_API_BASE_URL}group/update/group/object/${group}`, { name: personGroup.name, people: newPersonGroupPeople, groups: personGroup?.groups});
+                }
+        });
+
+        const allGroups: IGroup[] = (await axios.get(`${config.GROUP_API_BASE_URL}group/AllGroups`)).data;
+        allGroups.map(async (groupFromAll) => {
+            if((!person.groups.includes(groupFromAll._id!)) && groupFromAll.people.includes(id))
+            {
+                groupFromAll?.people.splice(groupFromAll?.people.indexOf(id), 1);
+                await axios.post(`${config.GROUP_API_BASE_URL}group/update/group/object/${groupFromAll._id}`, { name: groupFromAll.name, people: groupFromAll?.people, groups: groupFromAll?.groups});
+            }
+        });
+    }
+
+    await axios.post(`${config.PERSON_API_BASE_URL}person/update/person/object/${id}`, person);
 };
 
 // group: 
@@ -44,7 +123,7 @@ export const getAllGroupsAndPeopleInGroup = async(id: string): Promise<any> => {
         let foundGroup: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${group}`)).data;
         groupsOfGroup.push(foundGroup);
     });
-    const groupsAndPeopleInGroup: Object = {
+    const groupsAndPeopleInGroup: { people: IPerson[], groups: IGroup[] } = {
         people: peopleOfGroup,
         groups: groupsOfGroup
     }
