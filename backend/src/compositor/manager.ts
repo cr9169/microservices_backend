@@ -3,8 +3,6 @@ import IPerson from './interfaces/personInterface';
 import IGroup from './interfaces/groupInterface';
 import { config } from "../../config";
 
-// לכתוב רק פונציות שמשלבות אנשים וקבוצות, אם לא אז הוא ישתמש בפרוקסי שיעביר אותו לסרביסים בנפרד
-// לשנות לשימוש בפונרציות אקסיוס פשוטות בשילוב עם לוגיקה על מנת לבצע את הפעולות למטה
 // person:
 
 export const getPersonInGroupByName = async(name: string, groupID: string): Promise<{groups: IGroup[]} | Error> => {
@@ -111,7 +109,7 @@ export const updatePersonByID = async(id: string, person: IPerson): Promise<void
 
 // group: 
 
-export const getAllGroupsAndPeopleInGroup = async(id: string): Promise<any> => {
+export const getAllGroupsAndPeopleInGroup = async(id: string): Promise<{people: IPerson[], groups: IGroup[]}> => {
     const peopleOfGroup: IPerson[] = [];
     const groupsOfGroup: IGroup[] = [];
     const group: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${id}`)).data;
