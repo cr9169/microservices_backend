@@ -43,6 +43,10 @@ export const deleteGroupByID = async (id: string | null | undefined) => {
     // see if return is needed here
 }
 
+export const deleteGroupByIDRagular = async (id: string | null | undefined) => {
+    await groupModel.findOneAndRemove({_id:id});
+}
+
 
 export const createGroup = (groupName: string) => { 
 
@@ -79,8 +83,8 @@ export const updateGroupByID = async (group: IGroup, groupID: string) => { // up
     return groupModel.updateOne({_id: groupID}, group);
 }
 
-export const updateGroupObjectByID = async (groupID: string, group: IGroup) => { // update also groups of group 
-    return groupModel.updateOne({_id: groupID}, {group});
+export const updateGroupObjectByID = async (groupID: string, group: IGroup) => { // update also groups of group     
+    return groupModel.updateOne({_id: groupID}, group);
 }
 
 export const getAllGroupsAndPeopleInGroup = async (id: string) => {
@@ -92,5 +96,5 @@ export const getGroupByID = (id: string) => {
 };
 
 export const getAllGroups = () => {
-    return groupModel.find({}); 
+    return groupModel.find({}).exec(); 
 };

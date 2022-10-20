@@ -1,4 +1,4 @@
-import { getGroupByID, deleteGroupByID, createGroup, updateGroupByID, getAllGroupsAndPeopleInGroup, getAllGroups, updateGroupObjectByID } from "./repository";
+import { getGroupByID, deleteGroupByIDRagular, deleteGroupByID, createGroup, updateGroupByID, getAllGroupsAndPeopleInGroup, getAllGroups, updateGroupObjectByID } from "./repository";
 import IGroup from "./interface";
 import { groupModel } from "./model";
 
@@ -12,6 +12,10 @@ export const getAllGroupsM = () => {
 
 export const deleteGroupByIDM = (id: string) => {
     return deleteGroupByID(id);
+};
+
+export const deleteGroupByIDRagularM = (id: string) => {
+    return deleteGroupByIDRagular(id);
 };
 
 export const createGroupM = (groupName: string) => {

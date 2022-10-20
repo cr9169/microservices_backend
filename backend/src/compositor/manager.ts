@@ -16,10 +16,10 @@ export const getPersonInGroupByName = async(name: string, groupID: string): Prom
             let personFound: IPerson = (await axios.get(`${config.PERSON_API_BASE_URL}person/${person}`)).data;
             if (personFound && personFound.firstName == name)
             {
-                personFound.groups.map( async(personFoundgroup: string) => {
+                for(const personFoundgroup of personFound.groups) {
                     let foundGroup: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${personFoundgroup}`)).data;
                     personGroups.groups.push(foundGroup);
-                }) 
+                };
                 return personGroups; // 
             }
         }
@@ -32,11 +32,14 @@ export const getPersonInGroupByName = async(name: string, groupID: string): Prom
 
 export const getAllGroupsOfPerson = async(id: string): Promise<IGroup[]> => {
     const groupsOfPerson: IGroup[] = [];
-    const prs: IPerson = (await axios.get(`${config.PERSON_API_BASE_URL}person/${id}`)).data;
-    prs.groups.map( async(group: string) => {
-        let foundGroup: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${group}`)).data;
+    const people: IPerson = (await axios.get(`${config.PERSON_API_BASE_URL}person/${id}`)).data;
+
+    for(const group of people.groups) {
+        const foundGroup: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${group}`)).data;        
         groupsOfPerson.push(foundGroup);
-    })
+    };
+
+    console.log(groupsOfPerson);
 
     return groupsOfPerson;
 };
@@ -61,20 +64,21 @@ export const deletePersonByID = async(id: string): Promise<void> => {
     }
 };
 
-export const createPerson = async(person: IPerson): Promise<void> => {
+export const createPerson = async(person: IPerson): Promise<void> => {    
 
-    const createdPerson: IPerson = (await axios.post(`${config.PERSON_API_BASE_URL}person/simply/create/${person}`)).data;
+    const createdPerson: IPerson = (await axios.post(`${config.PERSON_API_BASE_URL}person/simply/create/`, person)).data;
 
 	createdPerson.groups.forEach( async (group) => {
         const foundGroup : IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${group}`)).data;
+        
         if(foundGroup)
         {
-            let name: string = foundGroup.name;
-            let groups: string[] = foundGroup.groups;
-            let persons: string[] = foundGroup.people; 
-            persons.push(createdPerson._id!.toString());
-            await axios.post(`${config.GROUP_API_BASE_URL}group/update/group/object/${group}`, { name: name, groups: groups, people: persons });
+            const persons: string[] = foundGroup.people; 
+            persons.push(createdPerson._id!);
+            await axios.post(`${config.GROUP_API_BASE_URL}group/update/group/object/${group}`, { name: foundGroup.name, groups: foundGroup.groups, people: persons });
+            
         }
+
         else
             console.error("cant find group");
     });
@@ -113,18 +117,30 @@ export const getAllGroupsAndPeopleInGroup = async(id: string): Promise<{people: 
     const peopleOfGroup: IPerson[] = [];
     const groupsOfGroup: IGroup[] = [];
     const group: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${id}`)).data;
-    group.people.map( async (person: string) => {
-        let foundPerson: IPerson = (await axios.get(`${config.PERSON_API_BASE_URL}person/${person}`)).data;
-        peopleOfGroup.push(foundPerson);
-    });
-    group.groups.map( async (group: string) => {
-        let foundGroup: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${group}`)).data;
-        groupsOfGroup.push(foundGroup);
-    });
+    if(group.people.length != 0) {
+        for(const person of group.people) {
+            console.log(person);
+            
+            let foundPerson: IPerson = (await axios.get(`${config.PERSON_API_BASE_URL}person/${person}`)).data;
+            if(foundPerson)
+                peopleOfGroup.push(foundPerson);
+        };
+    }
+
+    if(group.groups.length != 0) {
+        for(const groupOfGroup of group.groups) {
+            let foundGroup: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${groupOfGroup}`)).data;
+            if(foundGroup)
+                groupsOfGroup.push(foundGroup);
+        };
+    }
+
     const groupsAndPeopleInGroup: { people: IPerson[], groups: IGroup[] } = {
         people: peopleOfGroup,
         groups: groupsOfGroup
     }
+    console.log(groupsAndPeopleInGroup);
+    
 
     return groupsAndPeopleInGroup;
 };
@@ -135,7 +151,9 @@ export const updateGroupByID = async(groupID: string, group: IGroup): Promise<vo
     if(foundGroup)
     {
         group.people.forEach( async (person: string) => {
-            const groupPerson: IPerson | null = (await axios.get(`${config.PERSON_API_BASE_URL}group/${person}`)).data;
+            
+            const groupPerson: IPerson | null = (await axios.get(`${config.PERSON_API_BASE_URL}person/${person}`)).data;
+            
             if(!groupPerson?.groups.includes(groupID))
                 {
                     const newGroupPersonGroups: string[] | undefined = groupPerson?.groups; 
@@ -163,37 +181,47 @@ export const updateGroupByID = async(groupID: string, group: IGroup): Promise<vo
 export const deleteGroupByID = async(id: string): Promise<void> => {
     const group: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${id}`)).data;
 
-    const allPeople: IPerson[] = (await axios.get(`${config.PERSON_API_BASE_URL}person/All/The/People`)).data;
+    const allPeople: IPerson[] = (await axios.get(`${config.PERSON_API_BASE_URL}person/All/The/People`)).data;//1
+    console.log(allPeople);
+    
             
-    allPeople.map(async (personFromAll) => {
+    await Promise.allSettled(allPeople.map(async (personFromAll) => {
         if(personFromAll.groups.includes(group._id!))
         personFromAll?.groups.splice(personFromAll?.groups.indexOf(group._id!), 1);
+        console.log("before");
+        
         await axios.post(`${config.PERSON_API_BASE_URL}person/update/person/object/${personFromAll._id}`, { firstName: personFromAll.firstName, lastName: personFromAll.lastName,
             age: personFromAll.age, groups: personFromAll?.groups});
-    });
+        console.log("after");
+
+    }));
+
+
+
 
     if (group?.groups.length == 0)
     {
-        await axios.delete(`${config.GROUP_API_BASE_URL}group/${id}`);
+        console.log('herherhehrehr');
+        await axios.delete(`${config.GROUP_API_BASE_URL}group/ragular/${id}`);
         return;
     }
 
     else {
         const groups: string[] | undefined = group?.groups;
-        groups?.forEach(async (group) => {
-            await axios.delete(`${config.GROUP_API_BASE_URL}group/${group}`);
+        await Promise.allSettled(groups?.map(async (group) => {
+            await axios.delete(`${config.GROUP_API_BASE_URL}group/ragular/${group}`);
+            const allGroups: IGroup[] = (await axios.get(`${config.GROUP_API_BASE_URL}group/AllGroups`)).data;//2
+            console.log(allGroups);
             
-            const allGroups: IGroup[] = (await axios.get(`${config.GROUP_API_BASE_URL}group/AllGroups`)).data;
-            
-            allGroups.map(async (groupFromAll) => {
+            await Promise.allSettled(allGroups.map(async (groupFromAll) => {
                 if(groupFromAll.groups.includes(group))
                     groupFromAll?.groups.splice(groupFromAll?.groups.indexOf(group), 1);
 
                     await axios.post(`${config.GROUP_API_BASE_URL}group/update/group/object/${groupFromAll._id}`, { people: groupFromAll?.people, groups: groupFromAll?.groups});
-            });
-        });
+            }));
+        }));
 
-        await axios.delete(`${config.GROUP_API_BASE_URL}group/${id}`);
+        await axios.delete(`${config.GROUP_API_BASE_URL}group/ragular/${id}`);
     }
 };
 

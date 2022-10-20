@@ -24,6 +24,10 @@ export const deletePersonByID = async (id: string) => {
     return personModel.findOneAndRemove({_id:id});
 };
 
+export const deletePersonByIDRegular = async (id: string) => {
+    return personModel.findOneAndRemove({_id:id});
+};
+
 export const simplyCreatePerson = async (person: IPerson) => {
     const createdPerson: IPerson = await personModel.create(person);
     return createdPerson;
@@ -100,6 +104,5 @@ export const getAllGroupsOfPerson = async (id: string) => {
 };
 
 export const getAllPeople = () => {
-    
-    return personModel.find({});
+    return personModel.find({}).exec();
 }

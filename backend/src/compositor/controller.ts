@@ -1,7 +1,6 @@
 import express from "express";
 import {getPersonInGroupByName, getAllGroupsOfPerson, deletePersonByID, createPerson, updatePersonByID, getAllGroupsAndPeopleInGroup, updateGroupByID, deleteGroupByID} from "./manager"
 
-// לכתוב רק פונציות שמשלבות אנשים וקבוצות, אם לא אז הוא ישתמש בפרוקסי שיעביר אותו לסרביסים בנפרד
 // Person
 
 export const deletePersonByIDC = async (req:express.Request, res:express.Response) => {
