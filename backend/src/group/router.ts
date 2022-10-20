@@ -1,16 +1,19 @@
 import express, { Router } from 'express';
-import { getGroupByIDC, deleteGroupByIDC, createGroupC, updateGroupByIDC, getAllGroupsAndPeopleInGroupC, getPopulatedGroups, getAllGroupsC } from "./controller";
+import { getGroupByIDC, deleteGroupByIDRagularC, deleteGroupByIDC, createGroupC, updateGroupByIDC, getAllGroupsAndPeopleInGroupC, getPopulatedGroups, getAllGroupsC, updateGroupObjectByIDC } from "./controller";
 
 const groupRoute : Router = express.Router();
 
-groupRoute.get("/group/AllGroups", getAllGroupsC);
-groupRoute.get("/group/:id", getGroupByIDC); //
-groupRoute.get("/group/All/:id", getAllGroupsAndPeopleInGroupC); //
-groupRoute.get("/group/populated", getPopulatedGroups); //
+groupRoute.get("/AllGroups", getAllGroupsC); //
+groupRoute.get("/:id", getGroupByIDC); //
+groupRoute.get("/All/:id", getAllGroupsAndPeopleInGroupC); // ..
+groupRoute.get("/populated", getPopulatedGroups); // .. 
 
-groupRoute.delete("/group/:id", deleteGroupByIDC); //
-  
-groupRoute.post("/group", createGroupC); //
-groupRoute.post("/group/update/:id", updateGroupByIDC); //
+groupRoute.delete("/:id", deleteGroupByIDC); //
+groupRoute.delete("/ragular/:id", deleteGroupByIDRagularC); //
+
+groupRoute.post("/", createGroupC); //
+groupRoute.post("/update/:id", updateGroupByIDC); // ..
+groupRoute.post("/update/group/object/:id", updateGroupObjectByIDC); // 
+
 
 export default groupRoute;

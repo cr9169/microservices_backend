@@ -13,8 +13,8 @@ export const deleteGroupByID = async (id: string | null | undefined) => {
             allPeople.map(async (personFromAll) => {
             if(personFromAll.groups.includes(group?._id))
             personFromAll?.groups.splice(personFromAll?.groups.indexOf(group?._id), 1);
-                await personModel.updateOne({_id: personFromAll._id}, { firstName: personFromAll.firstName, lastName: personFromAll.lastName,
-                    age: personFromAll.age, groups: personFromAll?.groups});
+            await personModel.updateOne({_id: personFromAll._id}, { firstName: personFromAll.firstName, lastName: personFromAll.lastName,
+                age: personFromAll.age, groups: personFromAll?.groups});
         })
     })
 
@@ -37,10 +37,14 @@ export const deleteGroupByID = async (id: string | null | undefined) => {
             })
         });
 
-        return await groupModel.findOneAndRemove({_id:id});
+        await groupModel.findOneAndRemove({_id:id});
     }
 
     // see if return is needed here
+}
+
+export const deleteGroupByIDRagular = async (id: string | null | undefined) => {
+    await groupModel.findOneAndRemove({_id:id});
 }
 
 
@@ -79,6 +83,10 @@ export const updateGroupByID = async (group: IGroup, groupID: string) => { // up
     return groupModel.updateOne({_id: groupID}, group);
 }
 
+export const updateGroupObjectByID = async (groupID: string, group: IGroup) => { // update also groups of group     
+    return groupModel.updateOne({_id: groupID}, group);
+}
+
 export const getAllGroupsAndPeopleInGroup = async (id: string) => {
     return groupModel.findById(id).populate('groups').populate('people');
 };
@@ -88,5 +96,5 @@ export const getGroupByID = (id: string) => {
 };
 
 export const getAllGroups = () => {
-    return groupModel.find({}); 
+    return groupModel.find({}).exec(); 
 };

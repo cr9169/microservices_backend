@@ -24,6 +24,15 @@ export const deletePersonByID = async (id: string) => {
     return personModel.findOneAndRemove({_id:id});
 };
 
+export const deletePersonByIDRegular = async (id: string) => {
+    return personModel.findOneAndRemove({_id:id});
+};
+
+export const simplyCreatePerson = async (person: IPerson) => {
+    const createdPerson: IPerson = await personModel.create(person);
+    return createdPerson;
+}
+
 export const createPerson = async (person: IPerson) => {
     
     const createdPerson: IPerson = await personModel.create(person);
@@ -70,6 +79,10 @@ export const updatePersonByID = async (person: IPerson, id: string) => { // chec
     return personModel.updateOne({_id: id}, person);
 };
 
+export const updatePersonObjectByID = async (person: IPerson, id: string) => { // check if the actuall function is the problem in the backend (or the frontend)
+    return personModel.updateOne({_id: id}, person);
+};
+
 export const getPersonInGroupByName = async (name: string, groupID: string) => {
     let personFound: IPerson | null = null;
     const group = await groupModel.findById(groupID);
@@ -91,6 +104,5 @@ export const getAllGroupsOfPerson = async (id: string) => {
 };
 
 export const getAllPeople = () => {
-    
-    return personModel.find({});
+    return personModel.find({}).exec();
 }
