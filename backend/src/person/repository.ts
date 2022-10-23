@@ -11,7 +11,7 @@ export const getPersonByID = (id: string) => {
 export const deletePersonByID = async (id: string) => {
     const person = await personModel.findById(id);
 
-    if (person?.groups.length == 0)
+    if (person?.groups.length === 0)
         return personModel.findOneAndRemove({_id:id});
 
     const personGroups: string[] | undefined = person?.groups;
@@ -92,7 +92,7 @@ export const getPersonInGroupByName = async (name: string, groupID: string) => {
     }
     for(const person of group.people) {
         personFound = await personModel.findById(person);
-        if (personFound && personFound.firstName == name)
+        if (personFound && personFound.firstName === name)
             return personModel.findById(person).populate('groups');
     }
 };

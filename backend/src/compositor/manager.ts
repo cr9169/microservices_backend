@@ -5,7 +5,7 @@ import { config } from "../../config";
 
 // person:
 
-export const getPersonInGroupByName = async(name: string, groupID: string): Promise<{groups: IGroup[]} | Error> => {
+export const getPersonInGroupByName = async(name: string, groupID: string): Promise<{groups: IGroup[]}> => {
 
     const personGroups: { groups: IGroup[] } = { groups: [] };
     const group: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${groupID}`)).data;
@@ -13,20 +13,18 @@ export const getPersonInGroupByName = async(name: string, groupID: string): Prom
     if(group)
     {
         for(const person of group.people) {
-            let personFound: IPerson = (await axios.get(`${config.PERSON_API_BASE_URL}person/${person}`)).data;
-            if (personFound && personFound.firstName == name)
+            const personFound: IPerson = (await axios.get(`${config.PERSON_API_BASE_URL}person/${person}`)).data;
+            if (personFound && personFound.firstName === name)
             {
                 for(const personFoundgroup of personFound.groups) {
-                    let foundGroup: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${personFoundgroup}`)).data;
+                    const foundGroup: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${personFoundgroup}`)).data;
                     personGroups.groups.push(foundGroup);
                 };
                 return personGroups; // 
             }
         }
     }
-
-    return (new Error("cant find group!!!"));
-
+    throw new Error("cant find group!!!");
 };
 
 
@@ -47,7 +45,7 @@ export const getAllGroupsOfPerson = async(id: string): Promise<IGroup[]> => {
 export const deletePersonByID = async(id: string): Promise<void> => {
     const person: IPerson = (await axios.get(`${config.PERSON_API_BASE_URL}person/${id}`)).data;
 
-    if (person?.groups.length == 0)
+    if (!person?.groups.length)
     {
         await axios.delete(`${config.PERSON_API_BASE_URL}person/${id}`);
     }
@@ -79,8 +77,9 @@ export const createPerson = async(person: IPerson): Promise<void> => {
             
         }
 
-        else
+        else {
             console.error("cant find group");
+        }
     });
 };
 
@@ -117,7 +116,7 @@ export const getAllGroupsAndPeopleInGroup = async(id: string): Promise<{people: 
     const peopleOfGroup: IPerson[] = [];
     const groupsOfGroup: IGroup[] = [];
     const group: IGroup = (await axios.get(`${config.GROUP_API_BASE_URL}group/${id}`)).data;
-    if(group.people.length != 0) {
+    if(group.people.length !== 0) {
         for(const person of group.people) {
             console.log(person);
             
@@ -199,7 +198,7 @@ export const deleteGroupByID = async(id: string): Promise<void> => {
 
 
 
-    if (group?.groups.length == 0)
+    if (group?.groups.length === 0)
     {
         console.log('herherhehrehr');
         await axios.delete(`${config.GROUP_API_BASE_URL}group/ragular/${id}`);

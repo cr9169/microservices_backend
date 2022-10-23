@@ -18,7 +18,7 @@ export const deleteGroupByID = async (id: string | null | undefined) => {
         })
     })
 
-    if (group?.groups.length == 0)
+    if (group?.groups.length === 0)
         return groupModel.findOneAndRemove({_id:id});
 
     else {
