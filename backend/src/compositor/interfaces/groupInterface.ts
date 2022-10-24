@@ -1,5 +1,3 @@
-import IPerson from "./personInterface";
-
 export interface IGroup {
     _id?: string,
     name: string,

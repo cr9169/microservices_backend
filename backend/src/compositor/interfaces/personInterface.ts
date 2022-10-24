@@ -1,5 +1,3 @@
-import IGroup from "./groupInterface";
-
 export interface IPerson {
     _id?: string,
     firstName: string,
